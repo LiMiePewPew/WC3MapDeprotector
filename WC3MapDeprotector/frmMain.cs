@@ -352,11 +352,8 @@ namespace WC3MapDeprotector
         }
 
         private void btnHelp_Click(object sender, EventArgs e)
-        {
-            using (var form = new frmHelp())
-            {
-                form.ShowDialog();
-            }
+        { // Open online help doc 
+            Process.Start("explorer", "https://github.com/speige/WC3MapDeprotector/blob/main/help_doc.md");
         }
 
         private void btnYoutube_Click(object sender, EventArgs e)
