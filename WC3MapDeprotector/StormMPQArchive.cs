@@ -492,9 +492,9 @@ namespace WC3MapDeprotector
                                 _md5ToLocalDiskFileName[md5Hash] = pseudoFileFullPath;
                             }
 
-                            foreach (var fakeFileName in filesNotMatchingPredictedExtension)
+							_logEvent($"Multiple fileNames found for same file. {archiveFileName} had different extension than predicted {predictedExtension}, assuming it's a fake name and deleting it.");
+							foreach (var fakeFileName in filesNotMatchingPredictedExtension)
                             {
-                                _logEvent($"Multiple fileNames found for same file. {fakeFileName} had different extension than predicted {predictedExtension}, assuming it's a fake name and deleting it.");
                                 var oldMPQHash = MPQFullHash.Calculate(fakeFileName);
                                 RemoveFakeMPQHash(oldMPQHash);
                                 _discoveredFileNameToMD5.Remove(fakeFileName);
