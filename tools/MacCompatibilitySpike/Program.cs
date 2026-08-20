@@ -49,6 +49,7 @@ internal static class Program
         new("War3Net.CodeAnalysis.Decompilers", "War3Net/Binaries/War3Net.CodeAnalysis.Decompilers.dll"),
         new("War3Net.CodeAnalysis.Transpilers", "War3Net/Binaries/War3Net.CodeAnalysis.Transpilers.dll"),
         new("CSharp.lua", "War3Net/Binaries/CSharp.lua.dll"),
+        new("DotNetZip", "War3Net/Binaries/DotNetZip.dll"),
         new("Pidgin", "War3Net/Binaries/Pidgin.dll"),
         new("Microsoft.CodeAnalysis", "War3Net/Binaries/Microsoft.CodeAnalysis.dll"),
         new("Jass2Lua", "Jass2Lua/Jass2Lua.dll"),
