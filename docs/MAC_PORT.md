@@ -1,6 +1,6 @@
 # macOS Port
 
-This branch ports WC3MapDeprotector incrementally while keeping the existing Windows application working.
+WC3MapDeprotector is being ported incrementally while keeping the existing Windows application working.
 
 ## Scope
 
@@ -62,33 +62,90 @@ The spike intentionally does not reference the Windows Forms application. It tes
 - ClearScript V8 with real JavaScript execution
 - ImageSharp with a real PNG encode
 
-### Gate
+### Status: PASS on Apple Silicon
 
-Proceed to the StormLib macOS work when the spike reports:
+Observed on an `osx-arm64` Mac with .NET 8:
 
 ```text
 Critical failures: 0
+Informational warnings: 2
 GO: managed dependency layer is compatible enough to proceed to the StormLib macOS spike.
 ```
 
-A failure is not a reason to abandon the port. It identifies the exact dependency that should be replaced or rebuilt before the core is refactored.
+The two informational failures are expected for the first Mac release:
+
+- `FastMDX` does not load, but the current recovery path also uses `MdxLib` and regex scanning.
+- `NAudio.WinForms` requires Windows Forms and is not part of the cross-platform core.
+
+NLua is backed by a locally built, architecture-correct Lua 5.3.6 shared library. ClearScript V8, War3Net, Jass2Lua, MdxLib and ImageSharp all passed their probes.
 
 ## M1B: StormLib macOS spike
 
-After M1A passes or its blockers are understood:
+StormLib is pinned to upstream version 9.30.0 at commit:
 
-1. build StormLib for `osx-arm64`
-2. replace the fixed `StormLib.dll` lookup with a platform aware native library resolver
-3. remove the `kernel32.dll` dependency from the StormLib wrapper
-4. open one real `.w3x` on macOS
-5. enumerate archive entries and query the MPQ metadata required by `StormMPQArchive`
-6. compare results with the Windows implementation
+```text
+c430a0c7ffc13b5d8fdaf0d7574be9e826a890af
+```
 
-This is the first major GO/STOP gate for the full port.
+The build uses StormLib's bundled dependencies and produces a local shared library under `native/<rid>/`. Generated native sources, build caches and binaries are gitignored.
+
+### Native-load test
+
+Requirements:
+
+- .NET 8 SDK/runtime
+- CMake 3.25 or newer
+- the macOS command line developer tools
+
+If CMake is missing:
+
+```bash
+brew install cmake
+```
+
+Then run:
+
+```bash
+bash scripts/mac/run-stormlib-spike.sh
+```
+
+This first builds StormLib for the current Mac architecture and verifies that the required exports can be loaded from .NET.
+
+### Real Warcraft III map test
+
+Pass a local `.w3x` or `.w3m` path:
+
+```bash
+bash scripts/mac/run-stormlib-spike.sh "/path/to/map.w3x"
+```
+
+The spike validates:
+
+- `SFileOpenArchive`
+- `SFileCloseArchive`
+- `SFileGetFileInfo`
+- `SFileHasFile`
+- archive size
+- file count
+- file table size
+- MPQ sector size
+- presence of common Warcraft III map files such as `war3map.w3i`, JASS/Lua scripts and object data
+
+### Gate
+
+M1B passes when a real `.w3x` or `.w3m` reports:
+
+```text
+PASS SFileOpenArchive
+...
+GO: native StormLib can open and inspect this Warcraft III map on macOS.
+```
+
+After this gate, the next step is to move the proven native-loading approach into a platform-aware StormLib wrapper and start extracting the deprotection core from WinForms.
 
 ## Architecture rule
 
-Cross platform core code must not reference:
+Cross-platform core code must not reference:
 
 - `System.Windows.Forms`
 - `Microsoft.Win32.Registry`
@@ -98,4 +155,4 @@ Cross platform core code must not reference:
 - `Warcraft III.exe`
 - `World Editor.exe`
 
-Platform integrations will live behind interfaces or in platform specific projects after the core split.
+Platform integrations will live behind interfaces or in platform-specific projects after the core split.
