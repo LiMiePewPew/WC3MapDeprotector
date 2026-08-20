@@ -10,9 +10,20 @@ if ! command -v dotnet >/dev/null 2>&1; then
   exit 127
 fi
 
+DOTNET_VERSION="$(dotnet --version)"
+if [[ "${DOTNET_VERSION}" != 8.* ]]; then
+  echo "ERROR: this spike must run with the .NET 8 SDK. Current version: ${DOTNET_VERSION}" >&2
+  echo "If dotnet@8 is installed with Homebrew, run:" >&2
+  echo '  export DOTNET_ROOT="$(brew --prefix dotnet@8)/libexec"' >&2
+  echo '  export PATH="$(brew --prefix dotnet@8)/bin:$PATH"' >&2
+  exit 126
+fi
+
 echo "Repository: ${REPO_ROOT}"
-echo "dotnet:     $(dotnet --version)"
+echo "dotnet:     ${DOTNET_VERSION}"
 echo
 
 dotnet restore "${PROJECT}"
-dotnet run --project "${PROJECT}" --configuration Release --no-restore
+dotnet build "${PROJECT}" --configuration Release --no-restore
+bash "${SCRIPT_DIR}/build-lua53.sh"
+dotnet run --project "${PROJECT}" --configuration Release --no-build --no-restore
