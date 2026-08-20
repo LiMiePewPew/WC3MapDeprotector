@@ -2,3 +2,8 @@
 obj/
 bin/
 *.user
+
+# Local-only fixtures and reports used by the macOS port.
+# Warcraft III maps may be copyrighted or otherwise unsuitable for committing.
+test-maps-local/
+mac-port-results/
