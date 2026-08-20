@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!--
+    Keep this project deliberately independent from the Windows Forms app.
+    Its job is to answer one question: which existing dependencies can be
+    restored and loaded by a plain cross-platform .NET 8 process on macOS?
+  -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ClearScript.V8" Version="7.4.5" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.osx-arm64" Version="7.4.5" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.osx-x64" Version="7.4.5" />
+    <PackageReference Include="NLua" Version="1.4.32" />
+    <PackageReference Include="SixLabors.Fonts" Version="2.0.9" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />
+    <PackageReference Include="SpanJson" Version="4.2.1" />
+  </ItemGroup>
+</Project>
