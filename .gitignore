@@ -7,3 +7,4 @@ bin/
 # Warcraft III maps may be copyrighted or otherwise unsuitable for committing.
 test-maps-local/
 mac-port-results/
+.cache/
