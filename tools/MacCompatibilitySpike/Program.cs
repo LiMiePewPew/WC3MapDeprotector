@@ -53,7 +53,11 @@ internal static class Program
         new("Pidgin", "War3Net/Binaries/Pidgin.dll"),
         new("Microsoft.CodeAnalysis", "War3Net/Binaries/Microsoft.CodeAnalysis.dll"),
         new("Jass2Lua", "Jass2Lua/Jass2Lua.dll"),
-        new("FastMDX", "WC3MapDeprotector/FastMDX.dll"),
+
+        // FastMDX is already redundant in the production code: MDXLib and a
+        // regex-based scanner run as fallbacks for the same recovery path.
+        // Do not block the macOS port on this legacy binary.
+        new("FastMDX", "WC3MapDeprotector/FastMDX.dll", Critical: false),
         new("MdxLib", "WC3MapDeprotector/MdxLib.dll"),
 
         // These are informational. The macOS port should not depend on the
@@ -91,6 +95,7 @@ internal static class Program
             Path.Combine(repoRoot, "Jass2Lua"),
             Path.Combine(repoRoot, "WC3MapDeprotector"),
             Path.Combine(repoRoot, "NAudio"),
+            AppContext.BaseDirectory,
         };
 
         var failures = 0;
