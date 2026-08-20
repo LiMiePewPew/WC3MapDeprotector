@@ -68,6 +68,17 @@ if [[ "${ACTUAL_COMMIT}" != "${STORMLIB_COMMIT}" ]]; then
   exit 3
 fi
 
+# StormLib 9.30.0 passes the macOS framework flag as one quoted compiler
+# argument ("-framework Carbon"). Current Apple Clang rejects that form.
+# Keep the upstream commit pinned, but patch this build-only CMake detail so
+# CMake emits the standard two arguments: -framework Carbon.
+STORMLIB_CMAKE="${SOURCE_DIR}/CMakeLists.txt"
+sed -i '' 's/PRIVATE "-framework Carbon"/PRIVATE "-framework" "Carbon"/' "${STORMLIB_CMAKE}"
+if ! grep -Fq 'target_link_options(${LIBRARY_NAME} PRIVATE "-framework" "Carbon")' "${STORMLIB_CMAKE}"; then
+  echo "ERROR: could not apply the expected StormLib Carbon linker compatibility patch." >&2
+  exit 4
+fi
+
 rm -rf "${BUILD_DIR}"
 
 cmake \
@@ -91,7 +102,7 @@ done < <(find "${BUILD_DIR}" -type f \( -path "*/storm.framework/storm" -o -path
 if [[ -z "${STORM_BINARY}" || ! -f "${STORM_BINARY}" ]]; then
   echo "ERROR: StormLib build completed but no shared library/framework binary was found." >&2
   find "${BUILD_DIR}" -maxdepth 5 -type f -name '*storm*' -print >&2 || true
-  exit 4
+  exit 5
 fi
 
 cp "${STORM_BINARY}" "${OUTPUT_LIB}"
@@ -104,7 +115,7 @@ fi
 if ! file "${OUTPUT_LIB}" | grep -q "${ARCH}"; then
   echo "ERROR: built StormLib has unexpected architecture:" >&2
   file "${OUTPUT_LIB}" >&2
-  exit 5
+  exit 6
 fi
 
 echo
