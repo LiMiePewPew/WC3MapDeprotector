@@ -10,7 +10,7 @@ if ! command -v dotnet >/dev/null 2>&1; then
   exit 127
 fi
 
-"${SCRIPT_DIR}/build-stormlib.sh"
+bash "${SCRIPT_DIR}/build-stormlib.sh"
 
 case "$(uname -m)" in
   arm64)
